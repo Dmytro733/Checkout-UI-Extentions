@@ -1,4 +1,4 @@
-import {reactExtension, DatePicker} from '@shopify/ui-extensions-react/checkout';
+import {reactExtension, DatePicker, useApplyMetafieldsChange, useMetafield} from '@shopify/ui-extensions-react/checkout';
 import {React, useState} from 'react';
 
 // ./Delivery.jsx
@@ -8,14 +8,25 @@ export default reactExtension(
 );
 
 function Extension() {
-  const [deliveryDate, setDeliveryDate] = useState(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`);
+  const dateNow = {
+    value: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`
+  };
 
-  const hundleDateChange = (date) => {
-    setDeliveryDate(date)
-  }
+  const deliveryDate = useMetafield({
+    namespace: 'custom',
+    key: 'delivery_date'
+  }) || dateNow;
+
+  const setDeliveryDate = useApplyMetafieldsChange();
 
   return (
-    <DatePicker selected={deliveryDate} onChange={hundleDateChange} />
+    <DatePicker selected={deliveryDate?.value} onChange={(value) => setDeliveryDate({
+      type: 'updateMetafield',
+      namespace: 'custom',
+      key: 'delivery_date',
+      valueType: 'string',
+      value
+    })} />
   );
   
 }
